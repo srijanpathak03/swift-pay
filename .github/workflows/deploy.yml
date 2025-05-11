@@ -1,0 +1,69 @@
+name: Build and Deploy to Docker Hub
+
+on:
+  push:
+    branches:
+      - master # Trigger on pushes to the main branch
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check Out Repo
+        uses: actions/checkout@v2
+
+      - name: Cleanup Docker resources before build
+        run: |
+          echo "Cleaning up Docker resources before build"
+          sudo docker system prune -a -f --volumes
+          sudo docker builder prune -a -f
+          sudo docker container prune -f
+          sudo docker image prune -a -f
+          sudo docker volume prune -f
+          sudo docker network prune -f
+
+      - name: Prepare Dockerfile
+        run: cp ./docker/Dockerfile.user ./Dockerfile
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and Push Docker image
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          no-cache: true ## Ensure fresh build
+          tags: srijanpathak03/swiftpay:${{ github.sha }} # Tag using the commit hash to avoid conflicts
+
+      - name: Verify Pushed Image
+        run: docker pull srijanpathak03/swiftpay:${{ github.sha }} # Pull the latest image using the commit hash
+
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            # Pull the latest image and run the container
+            sudo docker pull srijanpathak03/swiftpay:${{ github.sha }}  # Pull the image using the commit hash
+            sudo docker stop web-app || true
+            sudo docker rm web-app || true
+            sudo docker run -e DATABASE_URL=${{secrets.DB_URL}} -e JWT_SECRET=${{secrets.JWT_SECRET}}  -d --name web-app -p 3005:3000 srijanpathak03/swiftpay:${{ github.sha }}   # Run with the specific tag
+            sudo docker exec web-app npm run db:migrate  # Run database migration
+
+      - name: Cleanup Docker resources after deployment
+        run: |
+          echo "Cleaning up Docker resources after deployment"
+          # Remove unused Docker images, containers, volumes, and networks to free up space
+          sudo docker system prune -a -f --volumes
+          sudo docker builder prune -a -f
+          sudo docker container prune -f
+          sudo docker image prune -a -f
+          sudo docker volume prune -f
+          sudo docker network prune -f

@@ -14,9 +14,9 @@ export default async function Layout({
     redirect("/home");
   }
   return (
-    <div className="flex pt-14 bg-slate-100 overflow-hidden">
+    <div className="flex pt-14 bg-dark overflow-hidden">
       <MobileNav>
-        <div className="w-32 md:w-60 md:border-r md:border-slate-300 min-h-svh flex-grow pt-28 md:mr-8 ml-4">
+        <div className="w-32 md:w-60 md:border-r md:border-dark-300 min-h-svh flex-grow pt-28 md:mr-8 ml-4">
           <div className="flex flex-col gap-4">
             <SidebarItem href={"/dashboard"} title="Home" icon={<HomeIcon />} />
             <SidebarItem

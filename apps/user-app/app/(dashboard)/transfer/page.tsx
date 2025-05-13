@@ -11,6 +11,9 @@ export const metadata: Metadata = {
   description: 'Transfer funds seamlessly with Swiftpay digital wallet application',
 }
 
+// Ensure this page is dynamically rendered
+export const dynamic = 'force-dynamic';
+
 async function getBalance() {
   const session = await getServerSession(authOptions);
   const balance = await prisma.balance.findFirst({

@@ -4,6 +4,8 @@ import prisma from "@repo/db/client";
 import { OnRampTransaction } from "../../../components/OnRampTransaction";
 import { Metadata } from 'next'
 
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
   title: 'Transactions | Swiftpay',
   description: 'Track all your transactions effortlessly with Swiftpay digital wallet application',

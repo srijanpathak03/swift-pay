@@ -8,7 +8,7 @@ export const OnRampTransaction = ({
   title = 'Recent Transactions',
 }: {
   transactions: {
-    time: Date;
+    time: string;
     amount: number;
     status: string;
     provider: string;
@@ -24,42 +24,45 @@ export const OnRampTransaction = ({
 
   if (!transactions.length) {
     return (
-      <Card title={title}>
-        <div className="text-center pb-8 pt-8">No Recent transactions</div>
-      </Card>
+      <div className="p-6">
+        <h3 className="text-xl font-semibold mb-4">{title}</h3>
+        <div className="text-center py-8 text-slate-400">No recent transactions</div>
+      </div>
     );
   }
 
   return (
-    <Card title={title}>
-      <div className="pt-2 ">
-        <div className="max-h-64 overflow-y-auto w-full ">
+    <div className="p-6">
+      <h3 className="text-xl font-semibold mb-4">{title}</h3>
+      <div className="pt-2">
+        <div className="max-h-64 overflow-y-auto w-full space-y-4">
           {displayedTransactions.map((t, index) => (
             <div
               key={index}
-              className="flex justify-between items-center mb-2 w-full "
+              className="flex justify-between items-center w-full border-b border-dark-200 pb-3"
             >
               <div>
-                <div className={` ${showAll ? 'pr-1 text-sm' : 'text-sm'}`}>
+                <div className="text-sm">
                   {isSentTransactions ? 'Sent INR' : 'Received INR'}
                 </div>
-                <div className="text-slate-600 text-xs">
-                  {t.time.toDateString()}
+                <div className="text-slate-400 text-xs">
+                  {new Date(t.time).toLocaleDateString()}
                 </div>
               </div>
               <div className="flex flex-col items-end">
-                <div className="text-sm w-full ">
+                <div className="text-sm">
                   {isSentTransactions
-                    ? `- Rs ${t.amount / 100}`
-                    : `+ Rs ${t.amount / 100}`}
+                    ? <span className="text-accent-blue-light">- ₹{(t.amount / 100).toFixed(2)}</span>
+                    : <span className="text-accent-green-light">+ ₹{(t.amount / 100).toFixed(2)}</span>
+                  }
                 </div>
-                <div className="text-sm pr-1">
+                <div className="text-sm">
                   {t.status === 'Completed' ? (
-                    <span className="text-green-500">Success</span>
+                    <span className="text-accent-green">Success</span>
                   ) : t.status === 'Pending' ? (
-                    <span className="text-yellow-500">Pending</span>
+                    <span className="text-amber-400">Pending</span>
                   ) : (
-                    <span className="text-red-500">Failed</span>
+                    <span className="text-red-400">Failed</span>
                   )}
                 </div>
               </div>
@@ -68,13 +71,13 @@ export const OnRampTransaction = ({
         </div>
         {transactions.length > 5 && (
           <button
-            className="mt-4 text-blue-500"
+            className="mt-6 text-accent-blue-light hover:text-accent-blue transition-colors"
             onClick={() => setShowAll(!showAll)}
           >
             {showAll ? 'Show Less' : 'Show All'}
           </button>
         )}
       </div>
-    </Card>
+    </div>
   );
 };

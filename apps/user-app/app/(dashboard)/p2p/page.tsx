@@ -6,6 +6,8 @@ export const metadata: Metadata = {
   description: 'Fast and safe P2P transfers with Swiftpay digital wallet application',
 }
 
+export const dynamic = 'force-dynamic';
+
 export default function () {
   return (
     <div className="w-full px-4 sm:px-6 lg:px-8 ">

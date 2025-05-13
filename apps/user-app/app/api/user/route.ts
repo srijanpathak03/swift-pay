@@ -1,31 +1,31 @@
+import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
-import { NextResponse } from "next/server";
 import { authOptions } from "../../lib/auth";
+import prisma from "@repo/db/client";
 
-export const GET = async () => {
-  try {
-    const session = await getServerSession(authOptions);
-    if (session.user) {
-      return NextResponse.json({
-        user: session.user,
-      });
-    }
-  } catch (e: any) {
-    return NextResponse.json(
+// Prevent static generation for this route
+export const dynamic = 'force-dynamic';
+
+export async function GET(request: NextRequest) {
+  const session = await getServerSession(authOptions);
+
+  if (!session?.user) {
+    return new NextResponse(
+      JSON.stringify({
+        success: false,
+        message: "Not authenticated",
+      }),
       {
-        error: e.message,
-      },
-      {
-        status: 403,
-      },
+        status: 401,
+      }
     );
   }
-  return NextResponse.json(
-    {
-      message: "You are not logged in",
+
+  const user = await prisma.user.findFirst({
+    where: {
+      id: Number(session.user.id),
     },
-    {
-      status: 403,
-    },
-  );
-};
+  });
+
+  return NextResponse.json({ user: user });
+}

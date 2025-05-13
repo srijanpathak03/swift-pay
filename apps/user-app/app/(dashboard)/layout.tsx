@@ -1,119 +1,144 @@
-import { getServerSession } from "next-auth";
-import { SidebarItem } from "../../components/SiderBarItem";
-import { authOptions } from "../lib/auth";
-import { redirect } from "next/navigation";
-import { MobileNav } from "../../components/MobileNav";
+"use client";
 
-export default async function Layout({
+import { useState, useEffect } from "react";
+import { SidebarItem } from "../../components/SiderBarItem";
+import { MobileNav } from "../../components/MobileNav";
+import { AppbarClient } from "../../AppbarClient";
+import { 
+  Home, 
+  ArrowLeftRight, 
+  Clock, 
+  TrendingUp, 
+  CreditCard, 
+  Users, 
+  Settings,
+  HelpCircle 
+} from "lucide-react";
+import { usePathname } from "next/navigation";
+
+export default function Layout({
   children,
 }: {
   children: React.ReactNode;
-}): Promise<JSX.Element> {
-  const session = await getServerSession(authOptions);
-  if (!session?.user) {
-    redirect("/home");
+}): JSX.Element {
+  const pathname = usePathname();
+  
+  // Check if user is authenticated on client-side
+  const [isLoading, setIsLoading] = useState(true);
+  
+  useEffect(() => {
+    const checkSession = async () => {
+      try {
+        const response = await fetch('/api/auth/session');
+        const session = await response.json();
+        
+        if (!session || !session.user) {
+          window.location.href = '/home';
+        } else {
+          setIsLoading(false);
+        }
+      } catch (error) {
+        console.error('Failed to check session:', error);
+        window.location.href = '/auth';
+      }
+    };
+    
+    checkSession();
+  }, []);
+  
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-dark flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-accent-blue"></div>
+      </div>
+    );
   }
+  
   return (
-    <div className="flex pt-14 bg-dark overflow-hidden">
-      <MobileNav>
-        <div className="w-32 md:w-60 md:border-r md:border-dark-300 min-h-svh flex-grow pt-28 md:mr-8 ml-4">
-          <div className="flex flex-col gap-4">
-            <SidebarItem href={"/dashboard"} title="Home" icon={<HomeIcon />} />
-            <SidebarItem
-              href={"/transfer"}
-              title="Transfer"
-              icon={<TransferIcon />}
-            />
-            <SidebarItem
-              href={"/transactions"}
-              title="Transactions"
-              icon={<TransactionsIcon />}
-            />
-            <SidebarItem
-              href={"/p2p"}
-              title="P2P Transfer"
-              icon={<P2PIcon />}
-            />
+    <div className="flex flex-col bg-dark min-h-screen">
+      {/* Use the existing AppbarClient for navigation */}
+      <div className="mb-16">
+        <AppbarClient />
+      </div>
+      
+      <div className="flex flex-1">
+        {/* Sidebar */}
+        <MobileNav>
+          <div className="w-60 border-r border-dark-300/50 min-h-screen flex-shrink-0 pt-6 pb-8 backdrop-blur-sm hidden md:block">
+            <div className="flex flex-col gap-2 px-3">
+              <div className="px-4 py-2 mb-2">
+                <p className="text-xs font-medium text-slate-400 uppercase tracking-wider">Main</p>
+              </div>
+              
+              <SidebarItem 
+                href="/dashboard" 
+                title="Dashboard" 
+                icon={<Home size={18} />} 
+                isActive={pathname === '/dashboard'}
+              />
+              <SidebarItem 
+                href="/transfer" 
+                title="Transfer Money" 
+                icon={<ArrowLeftRight size={18} />} 
+                isActive={pathname === '/transfer'}
+              />
+              <SidebarItem 
+                href="/transactions" 
+                title="Transactions" 
+                icon={<Clock size={18} />} 
+                isActive={pathname === '/transactions'}
+              />
+              <SidebarItem 
+                href="/p2p" 
+                title="P2P Payments" 
+                icon={<Users size={18} />} 
+                isActive={pathname === '/p2p'}
+              />
+              
+              <div className="px-4 py-2 mt-4 mb-2">
+                <p className="text-xs font-medium text-slate-400 uppercase tracking-wider">Finance</p>
+              </div>
+              
+              <SidebarItem 
+                href="/analytics" 
+                title="Analytics" 
+                icon={<TrendingUp size={18} />} 
+                isActive={pathname === '/analytics'}
+                comingSoon
+              />
+              <SidebarItem 
+                href="/cards" 
+                title="Cards" 
+                icon={<CreditCard size={18} />} 
+                isActive={pathname === '/cards'}
+                comingSoon
+              />
+              
+              <div className="mt-auto px-4 py-2 mt-4 mb-2">
+                <p className="text-xs font-medium text-slate-400 uppercase tracking-wider">Other</p>
+              </div>
+              
+              <SidebarItem 
+                href="/settings" 
+                title="Settings" 
+                icon={<Settings size={18} />} 
+                isActive={pathname === '/settings'}
+                comingSoon
+              />
+              <SidebarItem 
+                href="/help" 
+                title="Help Center" 
+                icon={<HelpCircle size={18} />} 
+                isActive={pathname === '/help'}
+                comingSoon
+              />
+            </div>
           </div>
-        </div>
-      </MobileNav>
-      <div className="flex-1 pb-10">{children}</div>
+        </MobileNav>
+        
+        {/* Main Content */}
+        <div className="flex-1 p-6">{children}</div>
+      </div>
     </div>
-  );
-}
-
-function HomeIcon() {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox="0 0 24 24"
-      strokeWidth="1.5"
-      stroke="currentColor"
-      className="w-4 h-4 md:w-6 md:h-6"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"
-      />
-    </svg>
-  );
-}
-
-function TransferIcon() {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox="0 0 24 24"
-      strokeWidth="1.5"
-      stroke="currentColor"
-      className="w-4 h-4 md:w-6 md:h-6"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M7.5 21 3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5"
-      />
-    </svg>
-  );
-}
-
-function TransactionsIcon() {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox="0 0 24 24"
-      strokeWidth="1.5"
-      stroke="currentColor"
-      className="w-4 h-4 md:w-6 md:h-6"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
-      />
-    </svg>
-  );
-}
-
-function P2PIcon() {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox="0 0 24 24"
-      strokeWidth="1.5"
-      stroke="currentColor"
-      className="w-4 h-4 md:w-6 md:h-6"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="m4.5 19.5 15-15m0 0H8.25m11.25 0v11.25"
-      />
-    </svg>
   );
 }

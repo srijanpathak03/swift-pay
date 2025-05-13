@@ -56,9 +56,14 @@ export function DashboardClient({ balance, transactions }: DashboardClientProps)
         className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12"
       >
         <motion.div variants={itemVariants} className="text-center mb-12">
-          <h1 className="text-3xl sm:text-4xl font-extrabold">
-            <span className="accent-gradient">SwiftPay</span> Dashboard
-          </h1>
+          <div className="flex items-center justify-center mb-4">
+            <div className="h-10 w-10 rounded-full bg-gradient-to-r from-accent-blue to-accent-green flex items-center justify-center mr-3 shadow-lg">
+              <Wallet className="h-5 w-5 text-white" />
+            </div>
+            <h1 className="text-3xl sm:text-4xl font-extrabold">
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-accent-blue to-accent-green">SwiftPay</span> Dashboard
+            </h1>
+          </div>
           <p className="mt-2 text-lg sm:text-xl text-slate-300">
             Manage your finances with ease
           </p>

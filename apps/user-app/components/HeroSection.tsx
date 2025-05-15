@@ -439,11 +439,11 @@ function Navbar({ isLoading }: { isLoading: boolean }) {
   }, []);
 
   const handleLogin = () => {
-    router.push('/auth/login');
+    router.push('/auth/');
   };
 
   const handleSignUp = () => {
-    router.push('/auth/register');
+    router.push('/auth/');
   };
 
   return (

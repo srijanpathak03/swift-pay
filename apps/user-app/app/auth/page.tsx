@@ -180,15 +180,16 @@ export default function LoginSignup() {
         transition={{ delay: 0.3 }}
         className="fixed top-4 left-4 z-10"
       >
-        <motion.button 
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-dark-200/80 backdrop-blur-sm border border-dark-300 text-slate-100 hover:bg-dark-300 transition-all duration-200 text-sm"
-          onClick={() => router.push('/')}
-        >
-          <ChevronLeft className="h-4 w-4" />
-          <span>Back</span>
-        </motion.button>
+        <Link href="/">
+          <motion.button 
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-dark-200/80 backdrop-blur-sm border border-dark-300 text-slate-100 hover:bg-dark-300 transition-all duration-200 text-sm"
+          >
+            <ChevronLeft className="h-4 w-4" />
+            <span>Back To Home</span>
+          </motion.button>
+        </Link>
       </motion.div>
       
       {/* Enhanced Animated Background Elements */}

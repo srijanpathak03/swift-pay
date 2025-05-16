@@ -66,7 +66,7 @@ swiftpay/
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/srijanpathak03/swiftpay.git
+   git clone https://github.com/srijanpathak03/swift-pay.git
    cd swiftpay
    ```
 
